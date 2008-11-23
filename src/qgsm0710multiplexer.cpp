@@ -706,7 +706,7 @@ void QGsm0710Multiplexer::close( int channel )
 QGsm0710MultiplexerServer::QGsm0710MultiplexerServer
             ( QSerialIODevice *device, int frameSize,
               bool advanced, QObject *parent )
-    : QGsm0710Multiplexer( device, frameSize, advanced, parent, true )
+    : QGsm0710Multiplexer( device, frameSize, advanced, parent, false)
 {
     // Nothing to do here at present.
 }
