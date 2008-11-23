@@ -1,0 +1,2 @@
+This contains the Qtopia muxer code to implement the FSO D-Bus interface
+for allocating channels.
