@@ -38,7 +38,7 @@ public:
     static bool chat( QSerialIODevice *device, const QString& cmd );
     static QString chatWithResponse
             ( QSerialIODevice *device, const QString& cmd );
-    static QSerialIODeviceMultiplexer *create( QSerialIODevice *device = 0 );
+    static QSerialIODeviceMultiplexer *create(QSerialIODevice *device, int frameSize, bool advanced );
 };
 
 #if ENABLED_FOO

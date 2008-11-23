@@ -4,6 +4,8 @@ QT = core
 INCLUDEPATH += src/
 DEPENDPATH  += src/
 
+
+# Qtopia source code
 HEADERS += \
     src/gsm0710_p.h \
     src/qgsm0710multiplexer.h \
@@ -18,3 +20,6 @@ SOURCES += \
     src/qserialiodevicemultiplexer.cpp \
     src/qserialport.cpp
 
+# Wrapper for FSO
+SOURCES += \
+    src/main.cpp

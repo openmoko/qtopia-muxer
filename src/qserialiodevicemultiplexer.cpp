@@ -257,82 +257,18 @@ static void forceStop( QSerialIODevice *device )
     on the \c{QTOPIA_PHONE_DEVICE} setting.
 */
 QSerialIODeviceMultiplexer *QSerialIODeviceMultiplexer::create
-            ( QSerialIODevice *device )
+            ( QSerialIODevice *device, int frameSize, bool advanced )
 {
-#if ENABLED_FOO
-    char *env;
-    bool stopForced = false;
-
-    // Construct the default device if necessary.
-    if ( !device ) {
-        env = getenv( "QTOPIA_PHONE_DEVICE" );
-#ifdef QTOPIA_PHONE_DEVICE
-        if ( !env || *env == '\0' )
-            env = QTOPIA_PHONE_DEVICE; // Allow custom.h to override.
-#endif
-        if ( !env || *env == '\0' ) {
-            qWarning( "QSerialIODeviceMultiplexer::create: serial device is not configured");
-            device = new QNullSerialIODevice();
-        } else {
-            device = QSerialPort::create( env );
-            if ( !device )
-                device = new QNullSerialIODevice();
-        }
-    }
-
-    // Bail out early if multiplexing has been temporarily disabled.
-    env = getenv( "QTOPIA_PHONE_MUX" );
-#ifdef QTOPIA_PHONE_MUX
-    if ( !env || *env == '\0' )
-        env = QTOPIA_PHONE_MUX;     // Allow custom.h to override.
-#endif
-    if ( env && !strcmp( env, "no" ) )
-        return new QNullSerialIODeviceMultiplexer( device );
-
-    // Get the name of the vendor multiplexer plugin to load.
-    env = getenv( "QTOPIA_PHONE_VENDOR" );
-#ifdef QTOPIA_PHONE_VENDOR
-    if ( !env || *env == '\0' )
-        env = QTOPIA_PHONE_VENDOR;  // Allow custom.h to override.
-#endif
-
-    // Load the specified multiplexer plugin and call its detection function.
-    if ( env && *env != '\0' ) {
-        static QPluginManager *pluginLoader = 0;
-        if (!pluginLoader)
-            pluginLoader = new QPluginManager( "multiplexers" );
-        QSerialIODeviceMultiplexerPluginInterface *plugin = 0;
-        QString name = QString(env) + "multiplex";
-        //qLog(Modem) << "querying multiplexer plugin" << name;
-        QObject *obj = pluginLoader->instance( name );
-        if( ( plugin = qobject_cast<QSerialIODeviceMultiplexerPluginInterface*>( obj ) )
-                    != 0 ) {
-            if( plugin->keys().contains( "QSerialIODeviceMultiplexerPluginInterface" ) ) {
-                if ( plugin->forceGsm0710Stop() && !stopForced ) {
-                    forceStop( device );
-                    stopForced = true;
-                }
-                if ( plugin->detect( device ) ) {
-                    return plugin->create( device );
-                }
-            }
-        }
-    }
-
     // Forcibly stop GSM 07.10 if that hasn't been done yet.
-    if ( !stopForced )
-        forceStop( device );
+    forceStop( device );
 
     // Try to activate GSM 07.10 in the most basic mode.
-    if ( QGsm0710Multiplexer::cmuxChat( device ) ) {
-        return new QGsm0710Multiplexer( device );
+    if ( QGsm0710Multiplexer::cmuxChat( device, frameSize, advanced ) ) {
+        return new QGsm0710Multiplexer( device, frameSize, advanced );
     }
 
     // Fall back to a null multiplexer if we could not create something better.
-    return new QNullSerialIODeviceMultiplexer( device );
-#else
-    abort();
-#endif
+    return 0;
 }
 
 /*!
