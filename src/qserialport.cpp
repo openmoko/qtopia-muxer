@@ -20,8 +20,8 @@
 ****************************************************************************/
 
 #include <qserialport.h>
-#include <qtopialog.h>
 
+#include <qdebug.h>
 #include <qsocketnotifier.h>
 #include <qtimer.h>
 
@@ -153,7 +153,7 @@ int QSerialPort::fd() const
 bool QSerialPort::open( OpenMode mode )
 {
     if ( isOpen() ) {
-        qLog(Modem) << "QSerialPort already open";
+        //qLog(Modem) << "QSerialPort already open";
         return false;
     }
 
@@ -163,7 +163,7 @@ bool QSerialPort::open( OpenMode mode )
         // Connect to a phone simulator via a TCP socket.
         d->fd = ::socket( AF_INET, SOCK_STREAM, 0 );
         if ( d->fd == -1 ) {
-            qLog(Modem) << "could not open socket";
+            //qLog(Modem) << "could not open socket";
             return false;
         }
         QString host = d->device.mid( 4 );
@@ -183,7 +183,7 @@ bool QSerialPort::open( OpenMode mode )
         if ( addr.sin_addr.s_addr == INADDR_NONE ) {
             ent = gethostbyname( lhost );
             if ( !ent ) {
-                qLog(Modem) << "could not resolve " << lhost;
+                //qLog(Modem) << "could not resolve " << lhost;
                 ::close( d->fd );
                 d->fd = -1;
                 return false;
@@ -192,7 +192,7 @@ bool QSerialPort::open( OpenMode mode )
         }
         addr.sin_port = htons( (unsigned short)port );
         if ( ::connect( d->fd, (struct sockaddr *)&addr, sizeof(addr) ) < 0 ) {
-            qLog(Modem) << "could not connect to phone simulator at " << lhost;
+            //qLog(Modem) << "could not connect to phone simulator at " << lhost;
             ::close( d->fd );
             d->fd = -1;
             return false;
@@ -207,13 +207,13 @@ bool QSerialPort::open( OpenMode mode )
         // aren't presently connected to a remote machine.
         d->fd = ::open( (const char *)d->device.toLatin1(), O_RDWR | O_NONBLOCK, 0 );
         if ( d->fd == -1 ) {
-            qLog(Modem) << "QSerialPort " << d->device << " cannot be openned";
+            //qLog(Modem) << "QSerialPort " << d->device << " cannot be openned";
             perror("QSerialPort cannot open");
             return false;
         }
         d->isTty = ::isatty( d->fd );
 
-        qLog(Modem) << "Device:" << d->device << "is a tty device:" << (d->isTty ? "True" : "False");
+        //qLog(Modem) << "Device:" << d->device << "is a tty device:" << (d->isTty ? "True" : "False");
 
         int fdflags;
         if ((fdflags = fcntl(d->fd, F_GETFL)) == -1 ||
@@ -223,7 +223,7 @@ bool QSerialPort::open( OpenMode mode )
             return false;
         }
 
-        qLog(Modem) << "NONBLOCK successfully reset";
+        //qLog(Modem) << "NONBLOCK successfully reset";
     }
 #endif
 #ifdef USE_TERMIOS
@@ -315,8 +315,10 @@ bool QSerialPort::open( OpenMode mode )
         }
         ::cfsetispeed( &t, speed );
         ::cfsetospeed( &t, speed );
+#if 0
         if( ::tcsetattr( d->fd, TCSANOW, &t ) < 0 )
             qLog(Modem) << "tcsetattr(" << d->fd << ") errno = " << errno;
+#endif
         int status = TIOCM_DTR | TIOCM_RTS;
         ::ioctl( d->fd, TIOCMBIS, &status );
 
@@ -438,7 +440,7 @@ qint64 QSerialPort::readData( char *data, qint64 maxlen )
             if ( errno == EWOULDBLOCK ) {
                 return 0;
             }
-            qLog(Modem) << "read errno = " << errno;
+            //qLog(Modem) << "read errno = " << errno;
             return -1;
         }
     }
@@ -448,7 +450,7 @@ qint64 QSerialPort::readData( char *data, qint64 maxlen )
         // with the phone simulator if it is shut down before Qtopia.
         // Don't do this for tty devices because there are some systems
         // that return zero when they should be returning EWOULDBLOCK.
-        qLog(Modem) << "QSerialPort::readData: other end closed the connection" ;
+        //qLog(Modem) << "QSerialPort::readData: other end closed the connection" ;
         close();
     }
     return result;
@@ -476,7 +478,7 @@ qint64 QSerialPort::writeData( const char *data, qint64 len )
             len -= (qint64)temp;
             data += (uint)temp;
         } else if ( errno != EINTR && errno != EWOULDBLOCK ) {
-            qLog(Modem) << "write(" << d->fd << ") errno = " << errno;
+            //qLog(Modem) << "write(" << d->fd << ") errno = " << errno;
             return -1;
         }
     }
@@ -680,6 +682,8 @@ bool QSerialPort::isValid() const
 #endif
 }
 
+
+#if ENABLE_FOO
 /*!
     \reimp
 
@@ -714,6 +718,7 @@ QProcess *QSerialPort::run( const QStringList& arguments,
         return QSerialIODevice::run( arguments, addPPPdOptions );
     }
 }
+#endif
 
 void QSerialPort::statusTimeout()
 {
@@ -731,6 +736,7 @@ void QSerialPort::statusTimeout()
 #endif
 }
 
+#if ENABLE_FOO
 void QSerialPort::pppdStateChanged( QProcess::ProcessState state )
 {
     if ( state == QProcess::NotRunning && !isOpen() ) {
@@ -746,6 +752,7 @@ void QSerialPort::pppdDestroyed()
         open( QIODevice::ReadWrite );
     }
 }
+#endif
 
 /*!
     Create and open a serial device from a \a name of the form \c{device:rate}.
@@ -771,7 +778,7 @@ QSerialPort *QSerialPort::create( const QString& name, int defaultRate,
             dev = dev.left( index );
         }
     }
-    qLog(Modem) << "opening serial device " << dev << " at " << rate;
+    //qLog(Modem) << "opening serial device " << dev << " at " << rate;
     QSerialPort *device = new QSerialPort( dev, rate );
     device->setFlowControl( flowControl );
     if ( !device->open( ReadWrite ) ) {
@@ -779,7 +786,7 @@ QSerialPort *QSerialPort::create( const QString& name, int defaultRate,
         delete device;
         return 0;
     } else {
-        qLog(Modem) << "Opened " << dev;
+        qWarning() << "Opened " << dev;
         return device;
     }
 }

@@ -40,6 +40,7 @@
 
 class QSerialIODevice;
 
+#if ENABLED_FOO
 class QPseudoTtyProcess : public QProcess
 {
     Q_OBJECT
@@ -67,5 +68,6 @@ private:
     bool readySeen;
     char buffer[1024];
 };
+#endif
 
 #endif // QSERIALIODEVICE_P_H

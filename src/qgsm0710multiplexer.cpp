@@ -20,7 +20,6 @@
 ****************************************************************************/
 
 #include <qgsm0710multiplexer.h>
-#include <qtopialog.h>
 #include <qmap.h>
 #include <alloca.h>
 #include "gsm0710_p.h"
@@ -169,7 +168,7 @@ int QGsm0710MultiplexerPrivate::read
 {
     len = (int)(MUXP(ctx)->device->read( (char *)data, len ));
     if ( qLogEnabled(Mux) ) {
-        qLog(Mux) << "QGsm0710MultiplexerPrivate::read()";
+        //qLog(Mux) << "QGsm0710MultiplexerPrivate::read()";
         for ( int i = 0; i < len; ++i ) {
             if( i >= 16 && (i % 16) == 0 )
                 fprintf(stdout, "\n");
@@ -184,7 +183,7 @@ int QGsm0710MultiplexerPrivate::write
         (struct gsm0710_context *ctx, const void *data, int len)
 {
     if ( qLogEnabled(Mux) ) {
-        qLog(Mux) << "QGsm0710MultiplexerPrivate::write()";
+        //qLog(Mux) << "QGsm0710MultiplexerPrivate::write()";
         for ( int i = 0; i < len; ++i ) {
             if( i >= 16 && (i % 16) == 0 )
                 fprintf(stdout, "\n");
@@ -219,7 +218,7 @@ void QGsm0710MultiplexerPrivate::debug_message
         (struct gsm0710_context *ctx, const char *msg)
 {
     Q_UNUSED(ctx);
-    qLog(Mux) << msg;
+    //qLog(Mux) << msg;
 }
 
 void QGsm0710MultiplexerPrivate::open_channel

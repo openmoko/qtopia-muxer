@@ -22,22 +22,17 @@
 #ifndef QSERIALIODEVICE_H
 #define QSERIALIODEVICE_H
 
-#include <qtopiaglobal.h>
+#include <muxerglobal.h>
 
 #include <qobject.h>
 #include <qiodevice.h>
 #include <qstring.h>
 #include <qstringlist.h>
-#include <qprocess.h>
 
-
-class QPseudoTtyProcess;
-class QAtChat;
 
 class QTOPIACOMM_EXPORT QSerialIODevice : public QIODevice
 {
     Q_OBJECT
-    friend class QPseudoTtyProcess;
 public:
     explicit QSerialIODevice( QObject *parent = 0 );
     ~QSerialIODevice();
@@ -58,10 +53,6 @@ public:
 
     virtual bool waitForReady() const;
 
-    virtual QProcess *run( const QStringList& arguments, bool addPPPdOptions );
-
-    virtual QAtChat *atchat();
-
     virtual void abortDial();
 
     virtual bool isValid() const;
@@ -74,10 +65,6 @@ signals:
 
 protected slots:
     void internalReadyRead();
-
-private:
-    QPseudoTtyProcess *process;
-    QAtChat *chat;
 };
 
 

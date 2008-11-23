@@ -19,10 +19,8 @@
 **
 ****************************************************************************/
 
-#include <qserialiodevice.h>
-#include <qtopiacomm/private/qserialiodevice_p.h>
-#include <qatchat.h>
-#include <qtopialog.h>
+#include "qserialiodevice.h"
+#include "qserialiodevice_p.h"
 
 #include <qsocketnotifier.h>
 #include <qtimer.h>
@@ -65,8 +63,6 @@
 QSerialIODevice::QSerialIODevice( QObject *parent )
     : QIODevice( parent )
 {
-    process = 0;
-    chat = 0;
 }
 
 /*!
@@ -74,8 +70,6 @@ QSerialIODevice::QSerialIODevice( QObject *parent )
 */
 QSerialIODevice::~QSerialIODevice()
 {
-    if ( process )
-        process->clearDevice();
 }
 
 /*!
@@ -274,6 +268,7 @@ static bool createPseudoTty(int& masterFd, int& slaveFd, char *ttyname)
 
 #endif // USE_POSIX_SYSCALLS
 
+#if ENABLED_FOO
 /*!
     Run a program with the supplied \a arguments, redirecting the
     device's data to stdin and stdout on the new process via a
@@ -350,6 +345,7 @@ QAtChat *QSerialIODevice::atchat()
         chat = new QAtChat( this );
     return chat;
 }
+#endif
 
 /*!
     Abort an \c{ATD} dial command.  The default implementation transmits a
@@ -375,12 +371,15 @@ void QSerialIODevice::abortDial()
 */
 void QSerialIODevice::internalReadyRead()
 {
+#if ENABLED_FOO
     if ( process )
         process->deviceReadyRead();
     else
+#endif
         emit readyRead();
 }
 
+#if ENABLED_FOO
 QPseudoTtyProcess::QPseudoTtyProcess
     ( QSerialIODevice *device, int masterFd, int slaveFd, bool isPPP )
     : QProcess()
@@ -515,6 +514,7 @@ void QPseudoTtyProcess::deviceReady()
         readySeen = true;
     }
 }
+#endif
 
 /*!
     \class QNullSerialIODevice

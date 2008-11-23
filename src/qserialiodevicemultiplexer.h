@@ -41,6 +41,7 @@ public:
     static QSerialIODeviceMultiplexer *create( QSerialIODevice *device = 0 );
 };
 
+#if ENABLED_FOO
 class QNullSerialIODeviceMultiplexerPrivate;
 
 class QTOPIACOMM_EXPORT QNullSerialIODeviceMultiplexer : public QSerialIODeviceMultiplexer
@@ -60,5 +61,6 @@ private slots:
 private:
     QNullSerialIODeviceMultiplexerPrivate *d;
 };
+#endif
 
 #endif /* QSERIALIODEVICEMULTIPLEXER_H */

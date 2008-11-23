@@ -19,17 +19,10 @@
 **
 ****************************************************************************/
 
-#include <qserialiodevicemultiplexer.h>
 #include <qgsm0710multiplexer.h>
-#include <qserialiodevicemultiplexerplugin.h>
-#include <qserialport.h>
-#include <qtopiacomm/private/qpassthroughserialiodevice_p.h>
-#include <qtopialog.h>
-#include <qpluginmanager.h>
-#include <qtopianamespace.h>
-#include <custom.h>
 #include <qmap.h>
 #include <alloca.h>
+#include <stdlib.h>
 
 /*!
     \class QSerialIODeviceMultiplexer
@@ -127,7 +120,7 @@ static QString readLine( QSerialIODevice *device )
     for(;;)
     {
         if ( !device->waitForReadyRead( 5000 ) ) {
-            qLog(Mux) << "*** mux setup timed out ***";
+            //qLog(Mux) << "*** mux setup timed out ***";
             return QString();
         }
         if ( device->getChar( &ch ) ) {
@@ -141,7 +134,7 @@ static QString readLine( QSerialIODevice *device )
         }
     }
     line[posn] = '\0';
-    qLog(AtChat) << "F :" << line;
+    //qLog(AtChat) << "F :" << line;
     return QString( line );
 }
 
@@ -163,7 +156,7 @@ bool QSerialIODeviceMultiplexer::chat
         return false;
 
     // Send the command to the serial device.
-    qLog(AtChat) << "T :" << cmd;
+    //qLog(AtChat) << "T :" << cmd;
     QByteArray cmdstr = cmd.toLatin1();
     const char *str = (const char *)cmdstr;
     device->write( str, strlen( str ) );
@@ -207,7 +200,7 @@ QString QSerialIODeviceMultiplexer::chatWithResponse
         return QString();
 
     // Send the command to the serial device.
-    qLog(AtChat) << "T :" << cmd;
+    //qLog(AtChat) << "T :" << cmd;
     QByteArray cmdstr = cmd.toLatin1();
     const char *str = (const char *)cmdstr;
     device->write( str, strlen( str ) );
@@ -249,7 +242,7 @@ static void forceStop( QSerialIODevice *device )
     device->write( force_terminate, 9 );
 
     // Wait for the line to settle.
-    Qtopia::msleep(250);
+    usleep(250);
 
     // Throw away any data that arrived in the meantime.
     char buffer[256];
@@ -266,6 +259,7 @@ static void forceStop( QSerialIODevice *device )
 QSerialIODeviceMultiplexer *QSerialIODeviceMultiplexer::create
             ( QSerialIODevice *device )
 {
+#if ENABLED_FOO
     char *env;
     bool stopForced = false;
 
@@ -309,7 +303,7 @@ QSerialIODeviceMultiplexer *QSerialIODeviceMultiplexer::create
             pluginLoader = new QPluginManager( "multiplexers" );
         QSerialIODeviceMultiplexerPluginInterface *plugin = 0;
         QString name = QString(env) + "multiplex";
-        qLog(Modem) << "querying multiplexer plugin" << name;
+        //qLog(Modem) << "querying multiplexer plugin" << name;
         QObject *obj = pluginLoader->instance( name );
         if( ( plugin = qobject_cast<QSerialIODeviceMultiplexerPluginInterface*>( obj ) )
                     != 0 ) {
@@ -336,6 +330,9 @@ QSerialIODeviceMultiplexer *QSerialIODeviceMultiplexer::create
 
     // Fall back to a null multiplexer if we could not create something better.
     return new QNullSerialIODeviceMultiplexer( device );
+#else
+    abort();
+#endif
 }
 
 /*!
@@ -352,7 +349,7 @@ QSerialIODeviceMultiplexer *QSerialIODeviceMultiplexer::create
 
     \sa QSerialIODeviceMultiplexer
 */
-
+#if ENABLED_FOO
 class QNullSerialIODeviceMultiplexerPrivate
 {
 public:
@@ -377,7 +374,7 @@ public:
 QNullSerialIODeviceMultiplexer::QNullSerialIODeviceMultiplexer( QSerialIODevice *device, QObject *parent )
     : QSerialIODeviceMultiplexer( parent )
 {
-    qLog(Modem) << "Multiplexing has been disabled.";
+    //qLog(Modem) << "Multiplexing has been disabled.";
     d = new QNullSerialIODeviceMultiplexerPrivate();
 
     d->device = device;
@@ -423,3 +420,4 @@ void QNullSerialIODeviceMultiplexer::dataClosed()
     d->data->setEnabled( false );
     d->primary->setEnabled( true );
 }
+#endif

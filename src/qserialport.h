@@ -61,7 +61,6 @@ public:
     bool cts() const;
     void discard();
     bool isValid() const;
-    QProcess *run( const QStringList& arguments, bool addPPPdOptions );
 
     // Create and open a serial device from a "device:rate" name.
     static QSerialPort *create( const QString& name, int defaultRate=115200,
@@ -73,8 +72,6 @@ protected:
 
 private slots:
     void statusTimeout();
-    void pppdStateChanged( QProcess::ProcessState state );
-    void pppdDestroyed();
 
 private:
     QSerialPortPrivate *d;
