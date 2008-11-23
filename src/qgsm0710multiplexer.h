@@ -38,13 +38,16 @@ public:
                                   QObject *parent = 0 );
     ~QGsm0710Multiplexer();
 
-    QSerialIODevice *channel( const QString& name );
+    void open( int channel );
+    void close( int channel );
 
     static bool cmuxChat( QSerialIODevice *device, int frameSize = 31,
                           bool advanced = false );
 
 protected:
+#if ENABLED_FOO
     virtual int channelNumber( const QString& name ) const;
+#endif
     void reinit();
 
 private slots:
@@ -58,8 +61,6 @@ private:
                          QObject *parent, bool server );
 
     void terminate();
-    void open( int channel );
-    void close( int channel );
 };
 
 class QTOPIACOMM_EXPORT QGsm0710MultiplexerServer : public QGsm0710Multiplexer

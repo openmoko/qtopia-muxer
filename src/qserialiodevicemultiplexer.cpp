@@ -263,8 +263,8 @@ QSerialIODeviceMultiplexer *QSerialIODeviceMultiplexer::create
     forceStop( device );
 
     // Try to activate GSM 07.10 in the most basic mode.
-    if ( QGsm0710Multiplexer::cmuxChat( device, frameSize, advanced ) ) {
-        return new QGsm0710Multiplexer( device, frameSize, advanced );
+    if ( QGsm0710MultiplexerServer::cmuxChat( device, frameSize, advanced ) ) {
+        return new QGsm0710MultiplexerServer( device, frameSize, advanced );
     }
 
     // Fall back to a null multiplexer if we could not create something better.

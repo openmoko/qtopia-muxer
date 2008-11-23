@@ -496,6 +496,8 @@ QGsm0710Multiplexer::~QGsm0710Multiplexer()
     delete d;
 }
 
+
+#if ENABLE_FOO
 /*!
     \reimp
 */
@@ -516,6 +518,7 @@ QSerialIODevice *QGsm0710Multiplexer::channel( const QString& name )
     d->channels.insert( number, channel );
     return channel;
 }
+#endif
 
 /*!
     Construct a \c{AT+CMUX} command with the specified parameters and
@@ -557,6 +560,7 @@ bool QGsm0710Multiplexer::cmuxChat( QSerialIODevice *device,
     return chat( device, cmd );
 }
 
+#if ENABLE_FOO
 /*!
     Returns the GSM 07.10 channel number associated with the channel \a name.
     Returns -1 if the channel name is not recognized.  The default channel
@@ -593,6 +597,7 @@ int QGsm0710Multiplexer::channelNumber( const QString& name ) const
     else
         return -1;
 }
+#endif
 
 /*!
     Re-initialize the multiplexing session.  This is called by
