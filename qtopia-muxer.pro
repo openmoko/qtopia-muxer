@@ -1,8 +1,10 @@
 TEMPLATE = app
-QT = core
+QT = core dbus
 
 INCLUDEPATH += src/
 DEPENDPATH  += src/
+
+LIBS += -lutil
 
 
 # Qtopia source code
@@ -21,5 +23,9 @@ SOURCES += \
     src/qserialport.cpp
 
 # Wrapper for FSO
+HEADERS += \
+    src/FSOImplementation.h
+
 SOURCES += \
-    src/main.cpp
+    src/main.cpp \
+    src/FSOImplementation.cpp

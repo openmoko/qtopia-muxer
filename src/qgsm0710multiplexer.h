@@ -38,7 +38,7 @@ public:
                                   QObject *parent = 0 );
     ~QGsm0710Multiplexer();
 
-    void open( int channel );
+    QSerialIODevice* open( int channel );
     void close( int channel );
 
     static bool cmuxChat( QSerialIODevice *device, int frameSize = 31,

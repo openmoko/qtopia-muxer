@@ -20,6 +20,7 @@
 
 #include "qserialport.h"
 #include "qgsm0710multiplexer.h"
+#include "FSOImplementation.h"
 
 #include <stdlib.h>
 
@@ -72,6 +73,13 @@ int main(int argc, char** argv)
         fprintf(stderr, "Failed to create a multiplexer device\n");
         return EXIT_FAILURE;
     }
+
+    QDBusConnection::systemBus().registerObject("/Muxer",
+                                                 new FSOImplementation(multiplexer),
+                                                 QDBusConnection::ExportScriptableContents);
+    bool result = QDBusConnection::systemBus().registerService("org.openmoko.qtopia.fso");
+    if (!result)
+        fprintf(stderr, "Failed to register service org.openmoko.qtopia.fso\n");
 
     printf("Set up the multiplexer. awaiting commands\n");
     app.exec();

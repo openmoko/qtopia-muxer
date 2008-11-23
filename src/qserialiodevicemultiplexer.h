@@ -33,8 +33,9 @@ public:
     explicit QSerialIODeviceMultiplexer( QObject *parent = 0 );
     ~QSerialIODeviceMultiplexer();
 
-    virtual void open (int channel) = 0;
+    virtual QSerialIODevice* open (int channel) = 0;
     virtual void close(int channel) = 0;
+
 
     static bool chat( QSerialIODevice *device, const QString& cmd );
     static QString chatWithResponse

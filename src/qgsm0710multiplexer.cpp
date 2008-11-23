@@ -627,11 +627,11 @@ void QGsm0710Multiplexer::terminate()
     emit server->terminated();
 }
 
-void QGsm0710Multiplexer::open( int channel )
+QSerialIODevice* QGsm0710Multiplexer::open( int channel )
 {
     // If there is already a channel open with this number, then ignore.
     if ( d->channels.contains( channel ) )
-        return;
+        return 0;
 
     // Create a new channel device and register it.
     QGsm0710MultiplexerChannel *device =
@@ -644,6 +644,8 @@ void QGsm0710Multiplexer::open( int channel )
     // Let interested parties know about the new channel.
     QGsm0710MultiplexerServer *server = (QGsm0710MultiplexerServer *)this;
     emit server->opened( channel, device );
+
+    return device;
 }
 
 void QGsm0710Multiplexer::close( int channel )
